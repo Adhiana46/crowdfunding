@@ -2,6 +2,7 @@ package campaign
 
 type CampaignFormatter struct {
 	ID               int    `json:"id"`
+	Slug             string `json:"slug"`
 	UserID           int    `json:"user_id"`
 	Name             string `json:"name"`
 	ShortDescription string `json:"short_description"`
@@ -13,6 +14,7 @@ type CampaignFormatter struct {
 func FormatCampaign(campaign Campaign) CampaignFormatter {
 	campaignFormatter := CampaignFormatter{
 		ID:               campaign.ID,
+		Slug:             campaign.Slug,
 		UserID:           campaign.UserID,
 		Name:             campaign.Name,
 		ShortDescription: campaign.ShortDescription,
