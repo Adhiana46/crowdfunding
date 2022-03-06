@@ -1,5 +1,7 @@
 package campaign
 
+import "fmt"
+
 type Service interface {
 	GetCampaigns(userID int) ([]Campaign, error)
 }
@@ -14,18 +16,19 @@ func NewService(repository Repository) *service {
 
 func (s *service) GetCampaigns(userID int) ([]Campaign, error) {
 	var campaigns []Campaign
+	var err error
 
 	if userID != 0 {
-		campaigns, err := s.repository.FindByUserID(userID)
-		if err != nil {
-			return campaigns, err
-		}
+		campaigns, err = s.repository.FindByUserID(userID)
 	} else {
-		campaigns, err := s.repository.FindAll()
-		if err != nil {
-			return campaigns, err
-		}
+		campaigns, err = s.repository.FindAll()
 	}
+
+	if err != nil {
+		return campaigns, err
+	}
+
+	fmt.Println("service", campaigns)
 
 	return campaigns, nil
 }
