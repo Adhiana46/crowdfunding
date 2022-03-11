@@ -1,9 +1,8 @@
 package campaign
 
-import "fmt"
-
 type Service interface {
 	GetCampaigns(userID int) ([]Campaign, error)
+	GetCampaign(id int) (Campaign, error)
 }
 
 type service struct {
@@ -28,7 +27,15 @@ func (s *service) GetCampaigns(userID int) ([]Campaign, error) {
 		return campaigns, err
 	}
 
-	fmt.Println("service", campaigns)
-
 	return campaigns, nil
+}
+
+func (s *service) GetCampaign(id int) (Campaign, error) {
+	campaign, err := s.repository.FindByID(id)
+
+	if err != nil {
+		return campaign, err
+	}
+
+	return campaign, nil
 }
