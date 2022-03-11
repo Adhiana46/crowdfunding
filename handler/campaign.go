@@ -3,6 +3,7 @@ package handler
 import (
 	"bwastartup-api/campaign"
 	"bwastartup-api/helper"
+	"bwastartup-api/user"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ func NewCampaignHandler(service campaign.Service) *campaignHandler {
 	return &campaignHandler{service}
 }
 
-// /api/v1/campaigns
+// GET /api/v1/campaigns
 func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 	var input campaign.GetCampaignsInput
 
@@ -39,7 +40,7 @@ func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// /api/v1/campaign/:id
+// GET /api/v1/campaign/:id
 func (h *campaignHandler) GetCampaign(c *gin.Context) {
 	var input campaign.GetCampaignDetailInput
 
@@ -61,5 +62,37 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 
 	formatter := campaign.FormatCampaignDetail(campaignObj)
 	response := helper.APIResponse("Campaigns retrieved successfully.", http.StatusOK, "success", formatter)
+	c.JSON(http.StatusOK, response)
+}
+
+// POST /api/v1/campaigns
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Create Campaign Failed.", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	// get from JWT
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newCampaign, err := h.service.CreateCampaign(input)
+	if err != nil {
+		response := helper.APIResponse("Create Campaign Failed.", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := campaign.FormatCampaign(newCampaign)
+
+	response := helper.APIResponse("Campaign has been created.", http.StatusOK, "success", formatter)
+
 	c.JSON(http.StatusOK, response)
 }
