@@ -109,7 +109,7 @@ func (s *service) SaveCampaignImage(input CreateCampaignImageInput, fileLocation
 		return CampaignImage{}, errors.New("Not an owner of campaign")
 	}
 
-	if *input.IsPrimary {
+	if input.IsPrimary {
 		_, err := s.repository.MarkAllImagesAsNonPrimary(input.CampaignID)
 		if err != nil {
 			return CampaignImage{}, err
@@ -118,7 +118,7 @@ func (s *service) SaveCampaignImage(input CreateCampaignImageInput, fileLocation
 
 	campaignImage := CampaignImage{}
 	campaignImage.CampaignID = input.CampaignID
-	campaignImage.IsPrimary = *input.IsPrimary
+	campaignImage.IsPrimary = input.IsPrimary
 	campaignImage.FileName = fileLocation
 
 	newCampaignImage, err := s.repository.CreateImage(campaignImage)
