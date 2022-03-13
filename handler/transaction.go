@@ -46,16 +46,10 @@ func (h *transactionHandler) GetCampaignTransactions(c *gin.Context) {
 
 // GET /api/v1/user/:id/transactions
 func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
-	var input transaction.GetUserTransactionsInput
+	// get from JWT
+	currentUser := c.MustGet("currentUser").(user.User)
 
-	err := c.ShouldBindUri(&input)
-	if err != nil {
-		response := helper.APIResponse("Failed to get user transactions.", http.StatusBadRequest, "error", nil)
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
-	transactions, err := h.service.GetTransactionsByUserID(input)
+	transactions, err := h.service.GetTransactionsByUserID(currentUser.ID)
 	if err != nil {
 		response := helper.APIResponse("Failed to get user transactions.", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
