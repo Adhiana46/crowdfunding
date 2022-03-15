@@ -5,6 +5,7 @@ import (
 	"bwastartup-api/campaign"
 	"bwastartup-api/handler"
 	"bwastartup-api/helper"
+	"bwastartup-api/payment"
 	"bwastartup-api/transaction"
 	"bwastartup-api/user"
 	"log"
@@ -15,6 +16,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
@@ -31,7 +34,8 @@ func main() {
 
 	userService := user.NewService(userRepo)
 	campaignService := campaign.NewService(campaignRepo)
-	transactionService := transaction.NewService(transactionRepo, campaignRepo)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepo, campaignRepo, paymentService)
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
@@ -60,6 +64,7 @@ func main() {
 	// Transactions
 	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactions)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactions)
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 
 	router.Run()
 }

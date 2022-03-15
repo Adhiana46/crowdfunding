@@ -44,7 +44,7 @@ func (h *transactionHandler) GetCampaignTransactions(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// GET /api/v1/user/:id/transactions
+// GET /api/v1/transactions
 func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
 	// get from JWT
 	currentUser := c.MustGet("currentUser").(user.User)
@@ -58,5 +58,33 @@ func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
 
 	formatter := transaction.FormatUserTransactions(transactions)
 	response := helper.APIResponse("User transactions retrieved successfully", http.StatusOK, "success", formatter)
+	c.JSON(http.StatusOK, response)
+}
+
+// POST /api/v1/transactions
+func (h *transactionHandler) CreateTransaction(c *gin.Context) {
+	var input transaction.CreateTransactionInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to create transaction.", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	input.User = c.MustGet("currentUser").(user.User)
+
+	newTransaction, err := h.service.CreateTransaction(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to create transaction.", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := transaction.FormatTransaction(newTransaction)
+	response := helper.APIResponse("Transaction created successfully", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 }
