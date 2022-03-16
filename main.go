@@ -12,17 +12,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
+	setupEnv()
+
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASS"),
@@ -74,6 +76,16 @@ func main() {
 	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 
 	router.Run()
+}
+
+func setupEnv() {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	filedir := filepath.Dir(ex)
+	envFilepath := filepath.FromSlash(filedir + "/.env")
+	_ = godotenv.Load(envFilepath)
 }
 
 func pingHandler(c *gin.Context) {
