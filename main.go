@@ -8,6 +8,7 @@ import (
 	"bwastartup-api/payment"
 	"bwastartup-api/transaction"
 	"bwastartup-api/user"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -74,6 +75,7 @@ func main() {
 	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactions)
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransactions)
 	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
+	api.POST("/transactions/notification", transactionHandler.GetNotification)
 
 	router.Run()
 }
@@ -84,8 +86,17 @@ func setupEnv() {
 		panic(err)
 	}
 	filedir := filepath.Dir(ex)
-	envFilepath := filepath.FromSlash(filedir + "/.env")
-	_ = godotenv.Load(envFilepath)
+	envFilePath := filepath.FromSlash(filedir + "/.env")
+
+	if _, err := os.Stat(envFilePath); errors.Is(err, os.ErrNotExist) {
+		envFilePath = "./.env"
+	}
+
+	if _, err := os.Stat(envFilePath); errors.Is(err, os.ErrNotExist) {
+		panic(".env file not exists")
+	}
+
+	_ = godotenv.Load(envFilePath)
 }
 
 func pingHandler(c *gin.Context) {

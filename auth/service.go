@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"os"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -18,7 +19,7 @@ func NewService() *jwtService {
 	return &jwtService{}
 }
 
-var SECRET_KEY = []byte("BWASTARTUP-SECRET")
+var SECRET_KEY = []byte(os.Getenv("JWT_SECRET"))
 
 func (s *jwtService) GenerateToken(userID int) (string, error) {
 	claim := jwt.MapClaims{}
