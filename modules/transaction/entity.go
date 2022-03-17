@@ -1,8 +1,8 @@
 package transaction
 
 import (
-	"bwastartup-api/campaign"
-	"bwastartup-api/user"
+	"bwastartup-api/modules/campaign"
+	"bwastartup-api/modules/user"
 	"time"
 )
 

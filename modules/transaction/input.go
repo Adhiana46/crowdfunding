@@ -1,6 +1,6 @@
 package transaction
 
-import "bwastartup-api/user"
+import "bwastartup-api/modules/user"
 
 type GetCampaignTransactionsInput struct {
 	ID   int `uri:"id" binding:"required"`

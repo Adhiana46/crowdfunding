@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bwastartup-api/auth"
-	"bwastartup-api/campaign"
-	"bwastartup-api/handler"
 	"bwastartup-api/helper"
-	"bwastartup-api/payment"
-	"bwastartup-api/transaction"
-	"bwastartup-api/user"
+	"bwastartup-api/modules/auth"
+	"bwastartup-api/modules/campaign"
+	"bwastartup-api/modules/payment"
+	"bwastartup-api/modules/transaction"
+	"bwastartup-api/modules/user"
 	"errors"
 	"fmt"
 	"log"
@@ -49,9 +48,9 @@ func main() {
 	transactionService := transaction.NewService(transactionRepo, campaignRepo, paymentService)
 	authService := auth.NewService()
 
-	userHandler := handler.NewUserHandler(userService, authService)
-	campaignHandler := handler.NewCampaignHandler(campaignService)
-	transactionHandler := handler.NewTransactionHandler(transactionService)
+	userHandler := user.NewHandler(userService, authService)
+	campaignHandler := campaign.NewHandler(campaignService)
+	transactionHandler := transaction.NewHandler(transactionService)
 
 	router := gin.Default()
 	router.Use(cors.Default())

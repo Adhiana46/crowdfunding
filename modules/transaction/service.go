@@ -1,8 +1,8 @@
 package transaction
 
 import (
-	"bwastartup-api/campaign"
-	"bwastartup-api/payment"
+	"bwastartup-api/modules/campaign"
+	"bwastartup-api/modules/payment"
 	"errors"
 	"strconv"
 )

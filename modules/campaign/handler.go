@@ -1,26 +1,25 @@
-package handler
+package campaign
 
 import (
-	"bwastartup-api/campaign"
 	"bwastartup-api/helper"
-	"bwastartup-api/user"
+	"bwastartup-api/modules/user"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type campaignHandler struct {
-	service campaign.Service
+type handler struct {
+	service Service
 }
 
-func NewCampaignHandler(service campaign.Service) *campaignHandler {
-	return &campaignHandler{service}
+func NewHandler(service Service) *handler {
+	return &handler{service}
 }
 
 // GET /api/v1/campaigns
-func (h *campaignHandler) GetCampaigns(c *gin.Context) {
-	var input campaign.GetCampaignsInput
+func (h *handler) GetCampaigns(c *gin.Context) {
+	var input GetCampaignsInput
 
 	err := c.ShouldBindQuery(&input)
 	if err != nil {
@@ -36,14 +35,14 @@ func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 		return
 	}
 
-	formatter := campaign.FormatCampaigns(campaigns)
+	formatter := FormatCampaigns(campaigns)
 	response := helper.APIResponse("Campaigns retrieved successfully.", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 }
 
 // GET /api/v1/campaign/:id
-func (h *campaignHandler) GetCampaign(c *gin.Context) {
-	var input campaign.GetCampaignDetailInput
+func (h *handler) GetCampaign(c *gin.Context) {
+	var input GetCampaignDetailInput
 
 	err := c.ShouldBindUri(&input)
 	if err != nil {
@@ -61,14 +60,14 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 		return
 	}
 
-	formatter := campaign.FormatCampaignDetail(campaignObj)
+	formatter := FormatCampaignDetail(campaignObj)
 	response := helper.APIResponse("Campaigns retrieved successfully.", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 }
 
 // POST /api/v1/campaigns
-func (h *campaignHandler) CreateCampaign(c *gin.Context) {
-	var input campaign.CreateCampaignInput
+func (h *handler) CreateCampaign(c *gin.Context) {
+	var input CreateCampaignInput
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -91,7 +90,7 @@ func (h *campaignHandler) CreateCampaign(c *gin.Context) {
 		return
 	}
 
-	formatter := campaign.FormatCampaign(newCampaign)
+	formatter := FormatCampaign(newCampaign)
 
 	response := helper.APIResponse("Campaign has been created.", http.StatusOK, "success", formatter)
 
@@ -99,9 +98,9 @@ func (h *campaignHandler) CreateCampaign(c *gin.Context) {
 }
 
 // PUT /api/v1/campaigns/:id
-func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
-	var inputID campaign.GetCampaignDetailInput
-	var inputData campaign.CreateCampaignInput
+func (h *handler) UpdateCampaign(c *gin.Context) {
+	var inputID GetCampaignDetailInput
+	var inputData CreateCampaignInput
 	var err error
 
 	err = c.ShouldBindUri(&inputID)
@@ -132,15 +131,15 @@ func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
 		return
 	}
 
-	formatter := campaign.FormatCampaign(updatedCampaign)
+	formatter := FormatCampaign(updatedCampaign)
 
 	response := helper.APIResponse("Campaign has been updated.", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *campaignHandler) UploadImage(c *gin.Context) {
-	var input campaign.CreateCampaignImageInput
+func (h *handler) UploadImage(c *gin.Context) {
+	var input CreateCampaignImageInput
 
 	err := c.ShouldBind(&input)
 	if err != nil {

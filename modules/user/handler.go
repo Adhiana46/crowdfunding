@@ -1,26 +1,25 @@
-package handler
+package user
 
 import (
-	"bwastartup-api/auth"
 	"bwastartup-api/helper"
-	"bwastartup-api/user"
+	"bwastartup-api/modules/auth"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type userHandler struct {
-	userService user.Service
+type handler struct {
+	userService Service
 	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
-	return &userHandler{userService, authService}
+func NewHandler(userService Service, authService auth.Service) *handler {
+	return &handler{userService, authService}
 }
 
-func (h *userHandler) RegisterUser(c *gin.Context) {
-	var input user.RegisterUserInput
+func (h *handler) RegisterUser(c *gin.Context) {
+	var input RegisterUserInput
 
 	err := c.ShouldBindJSON(&input)
 
@@ -49,15 +48,15 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatUser(newUser, token)
+	formatter := FormatUser(newUser, token)
 
 	response := helper.APIResponse("Account has been registered.", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *userHandler) Login(c *gin.Context) {
-	var input user.LoginInput
+func (h *handler) Login(c *gin.Context) {
+	var input LoginInput
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -85,15 +84,15 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatUser(loggedInUser, token)
+	formatter := FormatUser(loggedInUser, token)
 
 	response := helper.APIResponse("Logged In Successfully.", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
-	var input user.CheckEmailInput
+func (h *handler) CheckEmailAvailability(c *gin.Context) {
+	var input CheckEmailInput
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -129,7 +128,7 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *userHandler) UploadAvatar(c *gin.Context) {
+func (h *handler) UploadAvatar(c *gin.Context) {
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
@@ -140,7 +139,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	}
 
 	// get from JWT
-	currentUser := c.MustGet("currentUser").(user.User)
+	currentUser := c.MustGet("currentUser").(User)
 
 	userID := currentUser.ID
 	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
@@ -169,10 +168,10 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *userHandler) FetchUser(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(user.User)
+func (h *handler) FetchUser(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(User)
 
-	formatter := user.FormatUser(currentUser, "")
+	formatter := FormatUser(currentUser, "")
 
 	response := helper.APIResponse("Successfully fecth data user.", http.StatusOK, "success", formatter)
 

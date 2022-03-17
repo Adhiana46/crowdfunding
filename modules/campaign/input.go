@@ -1,6 +1,6 @@
 package campaign
 
-import "bwastartup-api/user"
+import "bwastartup-api/modules/user"
 
 type GetCampaignsInput struct {
 	UserID int `form:"user_id"`
