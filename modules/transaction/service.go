@@ -3,7 +3,11 @@ package transaction
 import (
 	"bwastartup-api/modules/campaign"
 	"bwastartup-api/modules/payment"
+	"crypto/sha512"
+	"encoding/hex"
 	"errors"
+	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -91,6 +95,16 @@ func (s *service) ProcessPayment(input TransactionNotificationInput) error {
 	transaction, err := s.repository.GetByID(transaction_id)
 	if err != nil {
 		return err
+	}
+
+	// Verify Signature
+	rawData := fmt.Sprintf("%s%s%s%s", input.OrderID, input.StatusCode, input.GrossAmount, os.Getenv("VT_SERVER_KEY"))
+	h := sha512.New()
+	h.Write([]byte(rawData))
+	calcSignatureKey := hex.EncodeToString(h.Sum(nil))
+
+	if calcSignatureKey != input.SignatureKey {
+		return errors.New("Invalid Signature")
 	}
 
 	if input.PaymentType == "credit_card" && input.TransactionStatus == "capture" && input.FraudStatus == "accept" {

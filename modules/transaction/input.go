@@ -18,4 +18,7 @@ type TransactionNotificationInput struct {
 	OrderID           string `json:"order_id"`
 	PaymentType       string `json:"payment_type"`
 	FraudStatus       string `json:"fraud_status"`
+	SignatureKey      string `json:"signature_key"`
+	StatusCode        string `json:"status_code"`
+	GrossAmount       string `json:"gross_amount"`
 }
